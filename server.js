@@ -160,8 +160,13 @@ app.delete("/posts/:id", auth, (req, res) => {
 });
 
 app.get("/health", (_, res) => res.json({ ok: true, users: users.size }));
+app.get("/", (_, res) => res.json({ service: "Influencer Factory API", status: "ok" }));
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Anthropic key: ${ANTHROPIC_KEY ? "OK" : "MISSING — add ANTHROPIC_API_KEY in Railway Variables"}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Anthropic key: ${ANTHROPIC_KEY ? "OK" : "MISSING — add ANTHROPIC_API_KEY in env"}`);
+  });
+}
+
+export default app;
