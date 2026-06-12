@@ -27,14 +27,13 @@ async function callClaude(system, user, maxTokens = 2000) {
 
 function pj(raw) {
   let c = raw.replace(/```json/gi, "").replace(/```/g, "").trim();
-  c = c.replace(/‘|’/g, "'").replace(/“|”/g, '"');
+  c = c.replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"');
   const s = c.indexOf("[") !== -1 ? c.indexOf("[") : c.indexOf("{");
   const e = Math.max(c.lastIndexOf("]"), c.lastIndexOf("}"));
   if (s === -1 || e < s) throw new Error("No JSON found in response");
   let str = c.slice(s, e + 1);
-  str = str.replace(//g, "").replace(/([^\])
-/g, "$1\n").replace(/([^\])	/g, "$1\t");
-  str = str.replace(/,s*([]}])/g, "$1");
+  str = str.replace(/[\r\n]+/g, " ").replace(/\t/g, " ");
+  str = str.replace(/,\s*([\]}])/g, "$1");
   try {
     return JSON.parse(str);
   } catch {
