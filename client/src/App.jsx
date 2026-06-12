@@ -26,17 +26,26 @@ async function callClaude(system, user, maxTokens = 2000) {
 }
 
 function pj(raw) {
-  let c = raw.replace(/```json/g, "").replace(/```/g, "").trim();
-  // Fix smart quotes
-  c = c.replace(/‘/g, "'").replace(/’/g, "'").replace(/“/g, '"').replace(/”/g, '"');
+  let c = raw.replace(/```json/gi, "").replace(/```/g, "").trim();
+  c = c.replace(/‘|’/g, "'").replace(/“|”/g, '"');
   const s = c.indexOf("[") !== -1 ? c.indexOf("[") : c.indexOf("{");
   const e = Math.max(c.lastIndexOf("]"), c.lastIndexOf("}"));
   if (s === -1 || e < s) throw new Error("No JSON found in response");
-  const str = c.slice(s, e + 1);
+  let str = c.slice(s, e + 1);
+  str = str.replace(//g, "").replace(/([^\])
+/g, "$1\n").replace(/([^\])	/g, "$1\t");
+  str = str.replace(/,s*([]}])/g, "$1");
   try {
     return JSON.parse(str);
-  } catch(err) {
-    throw new Error("JSON Parse error: " + err.message);
+  } catch {
+    const objs = [];
+    const rx = /{[^{}]*}/g;
+    let m;
+    while ((m = rx.exec(str)) !== null) {
+      try { objs.push(JSON.parse(m[0])); } catch {}
+    }
+    if (objs.length) return objs;
+    throw new Error("Failed to parse AI response. Please try again.");
   }
 }
 

@@ -93,9 +93,10 @@ Return exactly: [{"text":"tweet1"},{"text":"tweet2"},{"text":"tweet3"},{"text":"
     });
 
     const raw = response.content.filter(b => b.type === "text").map(b => b.text).join("");
+    console.log("[RAW CLAUDE RESPONSE]", JSON.stringify(raw));
     // Always extract via regex — immune to truncation and malformed JSON
     const matches = [...raw.matchAll(/"text"\s*:\s*"((?:[^"\\]|\\.)*)"/g)];
-    if (!matches.length) throw new Error("Failed to parse tweets — no text fields found");
+    if (!matches.length) throw new Error("Failed to parse tweets — raw: " + raw.slice(0, 300));
     const tweets = matches.map(m => ({ text: m[1].replace(/\n/g, " ").trim() }));
 
     const saved = tweets.map((t, i) => {
