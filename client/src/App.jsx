@@ -290,25 +290,31 @@ Each caption must have:
 Keep it simple and clean. No curly quotes. No special unicode.
 
 Return this exact JSON format:
-[{"topic":"topic name","captions":[{"caption":"hook line\\nbody line\\nbody line\\ncall to action\\n\\n#hashtag1 #hashtag2 #hashtag3","image_description":"short image description here"}]}]`
+[{"topic":"topic name","captions":[{"caption":"hook line\\nbody line\\nbody line\\ncall to action\\n\\n#hashtag1 #hashtag2 #hashtag3","image_description":"short image description here"}]}]`,
+        5000
       );
       await wtick(setA2,0,"✓"); await wtick(setA2,1,"running"); setPct(82);
       const packs = pj(r2);
       const posts = [];
       packs.forEach((pack,pi)=>{
-        (pack.captions||[]).forEach((item,ci)=>{
+        const ts = Date.now();
+        const captions = pack.captions || (pack.caption ? [pack] : []);
+        captions.forEach((item,ci)=>{
+          const text = item.caption || item.text || "";
+          if (!text) return;
           posts.push({
-            id:`${Date.now()}-${pi}-${ci}`,
+            id:`${ts}-${pi}-${ci}`,
             personaId:p.id, personaName:p.name,
             personaHandle:p.igHandle||"",
-            topic:pack.topic,
-            text:item.caption,
+            topic:pack.topic||"",
+            text,
             imageDescription:item.image_description||"",
             status:"pending",
             createdAt:new Date().toISOString()
           });
         });
       });
+      if (!posts.length) throw new Error("AI returned no captions — please try again");
       await wtick(setA2,1,"✓"); await wtick(setA2,2,"running"); setPct(97);
       await wtick(setA2,2,"✓"); setPct(100);
       setDone(true); addPosts(posts);
