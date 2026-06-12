@@ -1,0 +1,14 @@
+{
+  "buildCommand": "cd client && npm install && npm run build",
+  "outputDirectory": "client/build",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index" },
+    { "source": "/login",      "destination": "/api/index" },
+    { "source": "/signup",     "destination": "/api/index" },
+    { "source": "/health",     "destination": "/api/index" },
+    { "source": "/personas",   "destination": "/api/index" },
+    { "source": "/personas/:path*", "destination": "/api/index" },
+    { "source": "/posts",      "destination": "/api/index" },
+    { "source": "/posts/:path*","destination": "/api/index" }
+  ]
+}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
-const BACKEND = (typeof process !== "undefined" && process.env?.REACT_APP_API_URL) || null;
-const PREVIEW = !BACKEND;
+const BACKEND = (typeof process !== "undefined" && process.env?.REACT_APP_API_URL) || "";
+const PREVIEW = false;
 
 const ls = {
   get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
@@ -21,13 +21,8 @@ async function apiCall(method, path, body) {
 }
 
 async function callClaude(system, user, maxTokens = 2000) {
-  if (!PREVIEW) {
-    const d = await apiCall("POST", "/api/claude", { system, user, maxTokens });
-    return d.text;
-  }
-  // Preview mode — sandbox blocks direct API calls
-  // This will work correctly when deployed on Vercel + Render
-  throw new Error("Preview mode: API calls are blocked by the sandbox. Deploy on Vercel to use the full app.");
+  const d = await apiCall("POST", "/api/claude", { system, user, maxTokens });
+  return d.text;
 }
 
 function pj(raw) {
