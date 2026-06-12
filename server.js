@@ -95,7 +95,18 @@ Return: [{"text":"tweet content here"}]`
     const raw = response.content.filter(b => b.type === "text").map(b => b.text).join("");
     const s = raw.indexOf("["), e = raw.lastIndexOf("]");
     if (s === -1 || e === -1) throw new Error("Failed to parse tweets");
-    const tweets = JSON.parse(raw.slice(s, e + 1));
+    let jsonStr = raw.slice(s, e + 1);
+    // Fix unterminated strings: replace unescaped newlines/tabs inside strings
+    jsonStr = jsonStr.replace(/\n/g, " ").replace(/\r/g, "").replace(/\t/g, " ");
+    let tweets;
+    try {
+      tweets = JSON.parse(jsonStr);
+    } catch {
+      // Fallback: extract text fields with regex
+      const matches = [...jsonStr.matchAll(/"text"\s*:\s*"((?:[^"\\]|\\.)*)"/g)];
+      if (!matches.length) throw new Error("Failed to parse tweets");
+      tweets = matches.map(m => ({ text: m[1] }));
+    }
 
     const saved = tweets.map((t, i) => {
       const id = Date.now() + "-" + i;
