@@ -59,7 +59,7 @@ app.post("/api/claude", auth, async (req, res) => {
   try {
     const client = new Anthropic({ apiKey: ANTHROPIC_KEY });
     const response = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5",
       max_tokens: maxTokens,
       system,
       messages: [{ role: "user", content: user }]
@@ -81,7 +81,7 @@ app.post("/api/generate", auth, async (req, res) => {
   try {
     const client = new Anthropic({ apiKey: ANTHROPIC_KEY });
     const response = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5",
       max_tokens: 1500,
       system: "You are a ghostwriter. Output ONLY a JSON array starting with [ and ending with ]. No markdown, no explanation.",
       messages: [{
